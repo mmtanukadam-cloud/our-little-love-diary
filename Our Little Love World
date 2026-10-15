@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff0f6">
+<title>#Pranvi ♾️💗</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#fff5f8;color:#71364e;
+  font-family:system-ui,-apple-system,sans-serif;
+}
+main{max-width:650px;margin:auto;padding:24px 18px 50px}
+header{text-align:center;padding:26px 10px}
+.heart{font-size:45px}
+h1{color:#c43d78;margin:8px 0}
+p{line-height:1.6}
+.card{
+  background:white;border:1px solid #f7d5e3;
+  border-radius:22px;padding:20px;margin:15px 0;
+  box-shadow:0 8px 24px #b94d7010;
+}
+button,input,textarea{
+  width:100%;padding:13px;border-radius:13px;
+  border:1px solid #efc5d7;font:inherit;margin:6px 0;
+}
+button{
+  background:#d94e89;color:white;border:0;
+  font-weight:650;cursor:pointer;
+}
+button.secondary{background:#fde6ef;color:#a52f66}
+textarea{min-height:90px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{
+  background:#fff0f6;border-radius:17px;padding:16px;
+  min-height:90px
+}
+.small{font-size:13px;color:#a56b83}
+.hidden{display:none}
+#entries p{overflow-wrap:anywhere}
+footer{text-align:center;padding:20px;color:#bd6c91}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="heart">💗</div>
+    <h1>#Pranvi ♾️💗</h1>
+    <p>Two hearts. One little world. Forever.</p>
+  </header>
+
+  <section id="login" class="card">
+    <h2>Welcome to our world 🔐</h2>
+    <p>Choose your profile to enter the demo.</p>
+    <button onclick="enter('Pranvi')">Enter as Pranvi 💗</button>
+    <button class="secondary" onclick="enter('My Love')">
+      Enter as My Love ♾️
+    </button>
+    <p class="small">
+      Demo only: these profile buttons do not provide real security.
+    </p>
+  </section>
+
+  <section id="home" class="hidden">
+    <div class="card">
+      <p class="small">YOUR LITTLE WORLD</p>
+      <h2 id="welcome">Hello, love 💕</h2>
+      <p>Every love story is special. This one is ours.</p>
+      <div class="grid">
+        <div class="tile">💌<br><b>Love letters</b></div>
+        <div class="tile">📸<br><b>Our memories</b></div>
+        <div class="tile">🎵<br><b>Our song</b></div>
+        <div class="tile">♾️<br><b>Us, always</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💞 Our love counter</h2>
+      <label for="start">Our special date</label>
+      <input id="start" type="date">
+      <h2 id="days">∞</h2>
+      <p class="small">Days since our special day</p>
+      <button onclick="saveDate()">Save our date</button>
+    </div>
+
+    <div class="card">
+      <h2>💌 A little love letter</h2>
+      <input id="title" placeholder="Letter title">
+      <textarea id="note" placeholder="Write something from your heart..."></textarea>
+      <button onclick="saveNote()">Save love letter</button>
+      <div id="entries"></div>
+    </div>
+
+    <div class="card">
+      <h2>🌷 Our memories</h2>
+      <input id="memory" placeholder="A moment we want to remember">
+      <button onclick="saveMemory()">Save memory</button>
+      <div id="memories"></div>
+    </div>
+
+    <button class="secondary" onclick="leave()">Leave our world 🔒</button>
+    <p class="small">
+      This demo saves content only in this browser.
+      It does not upload photos or sync between devices.
+    </p>
+  </section>
+
+  <footer>Made with love ♡ #Pranvi ♾️💗</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let profile = '';
+
+function enter(name) {
+  profile = name;
+  $('login').classList.add('hidden');
+  $('home').classList.remove('hidden');
+  $('welcome').textContent = 'Hello, ' + name + ' 💗';
+  render();
+}
+
+function leave() {
+  profile = '';
+  $('home').classList.add('hidden');
+  $('login').classList.remove('hidden');
+}
+
+function read(key) {
+  try { return JSON.parse(localStorage.getItem(key)) || []; }
+  catch { return []; }
+}
+function write(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function saveNote() {
+  const text = $('note').value.trim();
+  if (!text) return alert('Write a little love first 💌');
+  const list = read('pranvi-notes');
+  list.unshift({
+    title: $('title').value.trim() || 'A little love note',
+    text, by: profile, date: new Date().toLocaleDateString()
+  });
+  write('pranvi-notes', list);
+  $('title').value = '';
+  $('note').value = '';
+  render();
+}
+
+function saveMemory() {
+  const text = $('memory').value.trim();
+  if (!text) return;
+  const list = read('pranvi-memories');
+  list.unshift({text, by:profile});
+  write('pranvi-memories', list);
+  $('memory').value = '';
+  render();
+}
+
+function saveDate() {
+  const date = $('start').value;
+  if (!date) return alert('Choose your special date 💗');
+  if (date > new Date().toISOString().slice(0,10))
+    return alert('Choose a date that has already arrived.');
+  localStorage.setItem('pranvi-date', date);
+  render();
+}
+
+function render() {
+  const notes = read('pranvi-notes');
+  $('entries').innerHTML = notes.map(n =>
+    '<div class="card"><b>' + escapeHTML(n.title) +
+    '</b><p>' + escapeHTML(n.text) +
+    '</p><span class="small">By ' + escapeHTML(n.by) +
+    ' · ' + escapeHTML(n.date) + '</span></div>'
+  ).join('') || '<p class="small">Your first love letter goes here 💗</p>';
+
+  const memories = read('pranvi-memories');
+  $('memories').innerHTML = memories.map(m =>
+    '<p>🌸 ' + escapeHTML(m.text) + ' <span class="small">— ' +
+    escapeHTML(m.by) + '</span></p>'
+  ).join('') || '<p class="small">Your memories will live here.</p>';
+
+  const date = localStorage.getItem('pranvi-date');
+  $('start').value = date || '';
+  $('days').textContent = date
+    ? Math.floor((Date.now() - new Date(date + 'T00:00:00').getTime())
+      / 86400000) + ' days 💞'
+    : '∞';
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;',
+    '"':'&quot;', "'":'&#39;'
+  })[c]);
+}
+</script>
+</body>
+</html>
